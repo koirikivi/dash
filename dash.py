@@ -114,6 +114,11 @@ def require_current_project(meta, projects):
     return project
 
 
+def delta_str(delta):
+    hours, seconds = divmod(delta.total_seconds(), 3600)
+    return "{0:2d}:{1:02d}".format(int(hours), int(seconds / 60 + 0.5))
+
+
 def project(project_name=None):
     """print, create or switch project"""
     meta, projects, records = load()
@@ -198,12 +203,13 @@ def log():
     project = require_current_project(meta, projects)
     records = sorted(filter_project_records(project, records),
                      key=lambda r: r.start)
-    row_format = "{0:20}{1:20}{2:20}"
-    print(row_format.format("PHASE", "START", "END"))
+    row_format = "{0:15}{1:20}{2:20}{3:15}"
+    print(row_format.format("PHASE", "START", "END", "DELTA"))
     for record in records:
         start = record.start.strftime("%Y-%m-%d %H:%M") if record.start else ""
         end = record.end.strftime("%Y-%m-%d %H:%M") if record.end else ""
-        print(row_format.format(record.phase, start, end))
+        delta = delta_str((record.end or now()) - record.start)
+        print(row_format.format(record.phase, start, end, delta))
 
 
 def usage():
