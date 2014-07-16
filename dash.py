@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import namedtuple
 import pickle
 import os
@@ -205,11 +205,15 @@ def log():
                      key=lambda r: r.start)
     row_format = "{0:15}{1:20}{2:20}{3:15}"
     print(row_format.format("PHASE", "START", "END", "DELTA"))
+    total_delta = timedelta()
     for record in records:
         start = record.start.strftime("%Y-%m-%d %H:%M") if record.start else ""
         end = record.end.strftime("%Y-%m-%d %H:%M") if record.end else ""
-        delta = delta_str((record.end or now()) - record.start)
+        delta_time = (record.end or now()) - record.start
+        total_delta += delta_time
+        delta = delta_str(delta_time)
         print(row_format.format(record.phase, start, end, delta))
+    print(row_format.format("(total)", "-", "-", delta_str(total_delta)))
 
 
 def usage():
